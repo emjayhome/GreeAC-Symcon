@@ -9,6 +9,14 @@
         { "caption": "formFanSteps6", "value": 6 },
         { "caption": "formFanSteps7", "value": 7 }
       ]},
+    { "type": "Select", "name": "encryptionType", "caption": "Verschlüsselung (Firmware)",
+      "options": [
+        { "caption": "AES-128-ECB (alt, Standard)", "value": "ECB" },
+        { "caption": "AES-128-GCM (neu, Gree ab ca. 2022)", "value": "GCM" }
+      ],
+      "description": "Wählen Sie den Verschlüsselungsmodus entsprechend der Firmware Ihres Geräts. Bei Problemen mit der Verbindung probieren Sie GCM."
+    },
+    { "type": "ValidationTextBox", "name": "broadcastAddress", "caption": "Broadcast-Adresse", "default": "192.168.6.255", "validation": ".+", "description": "IP-Broadcast-Adresse für Gerätesuche (z.B. 192.168.6.255)" },
     { "type": "CheckBox", "name": "swingLeRi", "caption": "formSwingLeRi" },
     { "type": "CheckBox", "name": "freshAir", "caption": "formFreshAir" },
     { "type": "CheckBox", "name": "autoLight", "caption": "formAutoLight" },

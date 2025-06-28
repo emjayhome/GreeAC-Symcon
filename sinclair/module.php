@@ -38,7 +38,9 @@ abstract class LogType
 // Klassendefinition
 class sinclair extends IPSModule {
     const defaultCryptKey = 'a3K8Bx%2r8Y7#xDh';
-
+    const defaultGcmKey = '{yxAHAY_Lm6pbC/<';
+    const GCM_IV = "5440784449675a516c5e6313"; // hex-encoded, 12 bytes
+    const GCM_ADD = "qualcomm-test";
 
     // Der Konstruktor des Moduls
     // Überschreibt den Standard Kontruktor von IPS
@@ -59,10 +61,11 @@ class sinclair extends IPSModule {
         $this->RegisterPropertyBoolean("autoLight", true);
         $this->RegisterPropertyBoolean("logInfo", false);
         $this->RegisterPropertyInteger("statusTimer", 60);
+        $this->RegisterPropertyString("encryptionType", "ECB");
+        $this->RegisterPropertyString("broadcastAddress", "192.168.6.255");
 
         $this->RegisterTimer("status_UpdateTimer", 0, 'Sinclair_getStatus($_IPS[\'TARGET\']);');
         $this->RegisterTimer("queue_WorkerTimer", 0, 'Sinclair_cmdQueueWorker($_IPS[\'TARGET\']);');
-
 
         $this->RequireParent("{82347F20-F541-41E1-AC5B-A636FD3AE2D8}");
     }
@@ -75,7 +78,6 @@ class sinclair extends IPSModule {
         $fanSteps = $this->ReadPropertyInteger("fanSteps");
         $hasSwingLeRi = $this->ReadPropertyBoolean("swingLeRi");
         $hasFreshAir = $this->ReadPropertyBoolean("freshAir");
-
 
         //Instanz ist aktiv
         if(!IPS_VariableProfileExists('Sinclair.DeviceMode'))
@@ -231,6 +233,7 @@ class sinclair extends IPSModule {
         return $Json;
     }
 
+
     public function RequestAction($Ident, $Value) {
         switch($Ident) {
             case 'power':
@@ -276,24 +279,42 @@ class sinclair extends IPSModule {
     }
 
     public function ReceiveData($JSONString){
+        $this->log('ReceiveData', 'Received data: ' . $JSONString, LogType::INFO);
         $actCmd = $this->GetBuffer('actualCommand');
-
         $recObj = json_decode($JSONString);
         $bufferObj = json_decode($recObj->Buffer);
-        $key = $actCmd < Commands::status ? self::defaultCryptKey : GetValueString($this->GetIDForIdent('deviceKey'));
-        $decrypted = $this->decrpyt($bufferObj->pack, $key);
+        $encryptionType = 'ECB';
+        if (isset($bufferObj->tag)) {
+            $encryptionType = 'GCM';
+        }
+        $this->log('ReceiveData', 'Encryption Type: ' . $encryptionType, LogType::INFO);
+        // Default-Key je nach Modus
+        if ($actCmd < Commands::status) {
+            $key = ($encryptionType === 'GCM') ? self::defaultGcmKey : self::defaultCryptKey;
+        } else {
+            $key = GetValueString($this->GetIDForIdent('deviceKey'));
+        }
+        $this->log('ReceiveData', 'Using key: ' . $key, LogType::INFO);
+        if ($encryptionType === 'GCM') {
+            $decrypted = $this->decryptGCM($bufferObj->pack, $bufferObj->tag ?? '', $key);
+            
+        } else {
+            $decrypted = $this->decrpyt($bufferObj->pack, $key);
+        }
+        $this->log('ReceiveData', 'Decrypted data: ' . $decrypted, LogType::INFO);
         $decObj = json_decode($decrypted);
 
         switch($actCmd){
             case Commands::scan:
+                if (!is_object($decObj) || !property_exists($decObj, 'mac') || $decObj->mac === null) {
+                    $this->log('ReceiveData', 'Fehler: Feld "mac" fehlt oder ist null! Decrypted: ' . print_r($decrypted, true), LogType::ERROR);
+                    return;
+                }
                 $mac = strtoupper(implode(':', str_split($decObj->mac, 2)));
                 SetValueString($this->GetIDForIdent('macAddress'), $mac);
-                SetValueString($this->GetIDForIdent('name'), $decObj->name);
-
+                SetValueString($this->GetIDForIdent('name'), isset($decObj->name) ? $decObj->name : '<unknown>');
                 SetValueString($this->GetIDForIdent('lastUpdate'), 'init '.date("Y-m-d H:i:s"));
-
                 $this->reduceCmdQueue();
-
                 $this->deviceBind();
                 break;
             case Commands::bind:
@@ -319,6 +340,7 @@ class sinclair extends IPSModule {
     }
 
     private function sendCommand($type, $cmdArr){
+        $this->log('sendCommand', 'send command: '.$type.' with data: '.json_encode($cmdArr), LogType::INFO);
         $cmdQueue = $this->getCmdQueue();
         $bAddCmd = true;
 
@@ -362,12 +384,7 @@ class sinclair extends IPSModule {
             // queue is empty -> disable timer
             $this->SetTimerInterval('queue_WorkerTimer', 0);
             return;
-        }/*else if(!@Sys_Ping(IPS_GetProperty($this->GetParent(), 'Host'), 1000)){
-            // device is not pingable -> retry in 10 seconds
-            $this->log('QueueWorker', 'device not pingable');
-            $this->SetTimerInterval('queue_WorkerTimer', 10000);
-            return;
-        }*/else{
+        } else{
             $this->SetTimerInterval('queue_WorkerTimer', 1000);
         }
 
@@ -391,7 +408,23 @@ class sinclair extends IPSModule {
             $this->SetBuffer('actualCommand', $type);
             $cmdQueue[0]['TIMESTAMP'] = microtime(true);
             $this->setCmdQueue($cmdQueue);
-            $this->SendDataToParent(json_encode(Array("DataID" => "{79827379-F36E-4ADA-8A95-5F8D1DC92FA9}", "Buffer" => json_encode($cmdArr))));
+            if ($type == Commands::scan) {
+                // Scan/initDevice: Sende per Broadcast und leite Antwort an ReceiveData
+                $json = json_encode($cmdArr);
+                $broadcastIp = $this->ReadPropertyString("broadcastAddress");
+                $response = $this->sendBroadcast($json, $broadcastIp, 7000);
+                if ($response !== false) {
+                    $this->log('cmdQueueWorker', 'Broadcast-Response: ' . $response, LogType::INFO);
+                    $this->ReceiveData(json_encode([
+                        "Buffer" => $response
+                    ]));
+                } else {
+                    $this->log('cmdQueueWorker', 'Keine Antwort auf Broadcast erhalten.', LogType::ERROR);
+                }
+            } else {
+                $this->SendDataToParent(json_encode(Array("DataID" => "{79827379-F36E-4ADA-8A95-5F8D1DC92FA9}", "Buffer" => json_encode($cmdArr))));
+                $this->log('QueueWorker', 'send command: '.$type.' with data: '.json_encode($cmdArr), LogType::INFO);
+            }
         }catch (Exception $e){
             $this->log('QueueWorker', $e->getMessage(), LogType::ERROR);
 
@@ -432,6 +465,7 @@ class sinclair extends IPSModule {
         $arr = array('t' => 'scan');
         $this->sendCommand(Commands::scan, $arr);
     }
+
     private function deviceBind(){
         $pack = array(
             't' => 'bind',
@@ -583,7 +617,6 @@ class sinclair extends IPSModule {
         $this->setOptLight(GetValueBoolean($this->GetIDForIdent('optHealth')));
     }
 
-
     private function parseStatus($cols, $dats){
         for($i=0;$i<count($cols);$i++){
             switch($cols[$i]){
@@ -634,19 +667,41 @@ class sinclair extends IPSModule {
     }
 
     private function getRequest($pack, $bDefKey=true){
-        $key = $bDefKey ? self::defaultCryptKey : GetValueString($this->GetIDForIdent('deviceKey'));
-
-        $arr = array(
-            'cid' => 'app',
-            'i' => $bDefKey ? 1 : 0,
-            'pack' => $this->encrypt(json_encode($pack), $key),
-            't' => 'pack',
-            'tcid' => $this->getMacUnformatted(),
-            'uid' => 22130
-        );
-
+        $encryptionType = $this->ReadPropertyString('encryptionType');
+        if (isset($pack['t']) && $pack['t'] === 'bind') {
+            $encryptionType = 'GCM';
+        }
+        if ($bDefKey) {
+            $key = ($encryptionType === 'GCM') ? self::defaultGcmKey : self::defaultCryptKey;
+        } else {
+            $key = GetValueString($this->GetIDForIdent('deviceKey'));
+        }
+        $strPack = json_encode($pack);
+        $this->log('getRequest', 'Using encryption type: ' . $encryptionType . ' - Pack: ' . $strPack, LogType::INFO);
+        if ($encryptionType === 'GCM') {
+            $enc = $this->encryptGCM($strPack, $key);
+            $arr = array(
+                'cid' => 'app',
+                'i' => $bDefKey ? 1 : 0,
+                'pack' => $enc['pack'],
+                'tag' => $enc['tag'],
+                't' => 'pack',
+                'tcid' => $this->getMacUnformatted(),
+                'uid' => 0
+            );
+        } else {
+            $arr = array(
+                'cid' => 'app',
+                'i' => $bDefKey ? 1 : 0,
+                'pack' => $this->encrypt($strPack, $key),
+                't' => 'pack',
+                'tcid' => $this->getMacUnformatted(),
+                'uid' => 0
+            );
+        }
         return $arr;
     }
+
     private function getCommand($opts, $vals){
         $cmd = array(
             't' => 'cmd',
@@ -656,6 +711,7 @@ class sinclair extends IPSModule {
 
         return $cmd;
     }
+
     private function getMacUnformatted(){
         $mac = GetValueString($this->GetIDForIdent('macAddress'));
         $mac = strtolower(str_replace(':', '', $mac));
@@ -693,6 +749,7 @@ class sinclair extends IPSModule {
                 $decrypt_len - $decrypt_padchar
             );
     }
+
     private function encrypt( $message, $key ){
         if($key == '')
             $key = self::defaultCryptKey;
@@ -711,6 +768,46 @@ class sinclair extends IPSModule {
         );
     }
 
+    private function encryptGCM($message, $key) {
+        if ($key == '')
+            $key = self::defaultGcmKey;
+        $iv = hex2bin(self::GCM_IV);
+        $aad = self::GCM_ADD;
+        $cipher = openssl_encrypt($message, 'aes-128-gcm', $key, OPENSSL_RAW_DATA, $iv, $tag, $aad);
+        return array(
+            'pack' => base64_encode($cipher),
+            'tag' => base64_encode($tag)
+        );
+    }
+
+    private function decryptGCM($pack_encoded, $tag_encoded, $key) {
+        if ($key == '')
+            $key = self::defaultGcmKey;
+        $iv = hex2bin(self::GCM_IV);
+        $aad = self::GCM_ADD;
+        $ciphertext = base64_decode($pack_encoded);
+        $tag = base64_decode($tag_encoded);
+        $decrypted = openssl_decrypt($ciphertext, 'aes-128-gcm', $key, OPENSSL_RAW_DATA, $iv, $tag, $aad);
+        $decrypted = str_replace("\xFF", '', $decrypted);
+        return $decrypted;
+    }
+
+    private function sendBroadcast($data, $broadcastIp, $port = 7000) {
+        $sock = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
+        if ($sock === false) {
+            $this->log('sendBroadcast', 'Socket konnte nicht erstellt werden: ' . socket_strerror(socket_last_error()), LogType::ERROR);
+            return false;
+        }
+        socket_set_option($sock, SOL_SOCKET, SO_BROADCAST, 1);
+        socket_sendto($sock, $data, strlen($data), 0, $broadcastIp, $port);
+        socket_set_option($sock, SOL_SOCKET, SO_RCVTIMEO, ["sec"=>2,"usec"=>0]);
+        $buf = '';
+        $from = '';
+        $fromPort = 0;
+        $bytes = @socket_recvfrom($sock, $buf, 1024, 0, $from, $fromPort);
+        socket_close($sock);
+        return $bytes !== false ? $buf : false;
+    }
 
     private function log($name, $data, $logLevel){
         $bLog = true;
