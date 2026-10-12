@@ -1,13 +1,13 @@
 {
-  "id": "{EF4B10AA-426A-4F37-A524-5B9AA681041F}",
-  "author": "emtek e.U.",
+  "id": "{73C2EDFA-A3AE-432E-BBDC-8B87491F9403}",
+  "author": "EmJay",
   "name": "sinclair",
-  "url": "",
+  "url": "https://github.com/emjayhome/GreeAC-Symcon",
   "compatibility": {
     "version": "5.0",
     "date": 1491343200
   },
-  "version": "2.1",
+  "version": "2.2",
   "build": 0,
   "date": 0
 }

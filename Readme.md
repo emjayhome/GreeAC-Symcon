@@ -1,4 +1,9 @@
 # Symcon Sinclair/Gree Klimaanlagen Modul
+
+Maintainer: **EmJay** ([GitHub: emjayhome](https://github.com/emjayhome)).
+
+Dieses eigenständig veröffentlichte Modul basiert ursprünglich auf dem Modul [GreeAC-Symcon von emtek-at](https://github.com/emtek-at/GreeAC-Symcon) und wurde unter anderem um AES-128-GCM-Unterstützung erweitert. Der Fork hat eigene IP-Symcon-Bibliotheks- und Modul-UUIDs.
+
 Modul um Klimaanlagen mit Wifi Modul der Hersteller Gree zu steuern.
 
 Unterstützte Marken:
@@ -41,7 +46,7 @@ Falls das Gerät für die Dauer von 15*[getStatus Intervall Sek] nicht pingbar i
 ### 3. Software-Installation
 
 Über das Modul-Control folgende URL hinzufügen.  
-`https://github.com/emtek-at/GreeAC-Symcon`  
+`https://github.com/emjayhome/GreeAC-Symcon`
 
 
 ### 4. Einrichten der Instanzen in IP-Symcon
