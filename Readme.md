@@ -6,7 +6,7 @@ Dieses eigenständig veröffentlichte Modul basiert ursprünglich auf dem Modul 
 
 Modul um Klimaanlagen mit Wifi Modul der Hersteller Gree zu steuern.
 
-Für neue Installationen ist **GREE AC WIFI** mit dem Präfix `GREE` und der Modul-ID `{A86CE842-B03D-429C-B633-E5CF550592B7}` vorgesehen. Der ältere Eintrag **GREE AC WIFI Legacy** bleibt unter seiner bisherigen Modul-ID `{74450BAA-459C-4042-8A4C-BF7DDA175259}` verfügbar, damit bestehende Instanzen und Skripte mit dem Präfix `SINCLAIR` weiter funktionieren. Bestehende Instanzen werden nicht automatisch auf die neue Modul-ID migriert.
+Das Modul **GREE AC WiFi** verwendet die Modul-ID `{74450BAA-459C-4042-8A4C-BF7DDA175259}` und den Präfix `GREE`. Die bisherige Modul-ID bleibt erhalten, damit bestehende Instanzen ihre Identität und Konfiguration behalten.
 
 Unterstützte Marken:
 - Sinclair
@@ -50,12 +50,12 @@ Falls das Gerät für die Dauer von 15*[getStatus Intervall Sek] nicht pingbar i
 Über das Modul-Control folgende URL hinzufügen.  
 `https://github.com/emjayhome/GreeAC-Symcon`
 
-Bei einem Update erhalten bestehende Instanzen weiterhin die Legacy-Modul-ID. Um eine Instanz auf **GREE AC WIFI** umzustellen, muss eine neue Instanz angelegt und mit denselben Geräte- und Verbindungseinstellungen konfiguriert werden. Anschließend sind Skripte, Visualisierungen und Links auf die neue Instanz bzw. deren Variablen umzustellen. Die Legacy-Instanz sollte erst gelöscht werden, wenn die neue Instanz geprüft und alle Verwendungen migriert wurden.
+Nach einem Update bleibt die bestehende Instanz mit ihrer Konfiguration erhalten. Da der öffentliche Präfix von `SINCLAIR` auf `GREE` wechselt, müssen Skripte, die Modul-Funktionen aufrufen, von `SINCLAIR_...` auf `GREE_...` umgestellt werden. Die Variablenprofile heißen danach `GREE.*` statt `Sinclair.*`.
 
 
 ### 4. Einrichten der Instanzen in IP-Symcon
 
-- Unter "Instanz hinzufügen" ist das 'GREE AC WIFI'-Modul unter dem Hersteller 'GREE' aufgeführt. Für vorhandene Installationen bleibt zusätzlich 'GREE AC WIFI Legacy' verfügbar.
+- Unter "Instanz hinzufügen" ist das 'GREE AC WiFi'-Modul unter dem Hersteller 'GREE' aufgeführt.
 
 #### 4.1 Gateway konfigurieren
 __Konfigurationsseite__:
@@ -124,7 +124,7 @@ Die Instanz wird im WebFront angezeigt. Sie können die vorhandenen Funktionen n
 
 ### 7. PHP-Befehlsreferenz
 
-Präfix des neuen Moduls 'GREE'. Der Kompatibilitätseintrag für bestehende Instanzen verwendet weiterhin 'SINCLAIR'.
+Präfix des Moduls 'GREE'.
 
 `GREE_initDevice(integer $instanceId)`
 
@@ -216,4 +216,4 @@ Lässt das Gerät einmal piepsen.
 
 Leert die Commandqueue falls Probleme erkannt werden.
 
-Bestehende Skripte, die an den Legacy-Modul-Eintrag gebunden sind, verwenden weiterhin die entsprechenden `SINCLAIR_`-Funktionen.
+Bestehende Skripte müssen nach dem Update die entsprechenden `GREE_`-Funktionen statt der bisherigen `SINCLAIR_`-Funktionen verwenden.

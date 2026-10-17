@@ -1,12 +1,12 @@
 {
   "id": "{74450BAA-459C-4042-8A4C-BF7DDA175259}",
-  "name": "GREE AC WIFI Legacy",
+  "name": "GREE AC WiFi",
   "type": 3,
   "vendor": "GREE",
-  "aliases": [ "Sinclair AC Wifi", "Gree AC Wifi" ],
+  "aliases": [ "GREE AC WIFI", "Sinclair AC Wifi", "Gree AC Wifi" ],
   "parentRequirements": ["{79827379-F36E-4ADA-8A95-5F8D1DC92FA9}"],
   "childRequirements": [],
   "implemented": ["{018EF6B5-AB94-40C6-AA53-46943E824ACF}"],
-  "prefix": "Sinclair",
+  "prefix": "GREE",
   "url": "https://github.com/emjayhome/GreeAC-Symcon"
 }

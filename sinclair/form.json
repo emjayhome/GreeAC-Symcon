@@ -25,7 +25,7 @@
   ],
   "actions":
   [
-    { "type": "Button", "label": "Init Device", "onClick": "Sinclair_initDevice($id);" }
+    { "type": "Button", "label": "Init Device", "onClick": "GREE_initDevice($id);" }
   ],
   "status":
   [

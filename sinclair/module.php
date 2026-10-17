@@ -1,6 +1,6 @@
 <?php
 
-abstract class Commands
+abstract class GREECommands
 {
     const none = '-1';
     const scan = '0';
@@ -9,7 +9,7 @@ abstract class Commands
     const cmd = '3';
 }
 
-abstract class DeviceParam
+abstract class GREEDeviceParam
 {
     const Power = "Pow";
     const Mode = "Mod";
@@ -29,14 +29,14 @@ abstract class DeviceParam
     const OptTurbo = "Tur";
 }
 
-abstract class LogType
+abstract class GREELogType
 {
     const INFO = 0;
     const ERROR = 10;
 }
 
 // Klassendefinition
-class GREEACWIFILEGACY extends IPSModule {
+class GREEACWIFI extends IPSModule {
     const defaultCryptKey = 'a3K8Bx%2r8Y7#xDh';
     const defaultGcmKey = '{yxAHAY_Lm6pbC/<';
     const GCM_IV = "5440784449675a516c5e6313"; // hex-encoded, 12 bytes
@@ -64,8 +64,8 @@ class GREEACWIFILEGACY extends IPSModule {
         $this->RegisterPropertyString("encryptionType", "ECB");
         $this->RegisterPropertyString("broadcastAddress", "192.168.6.255");
 
-        $this->RegisterTimer("status_UpdateTimer", 0, 'Sinclair_getStatus($_IPS[\'TARGET\']);');
-        $this->RegisterTimer("queue_WorkerTimer", 0, 'Sinclair_cmdQueueWorker($_IPS[\'TARGET\']);');
+        $this->RegisterTimer("status_UpdateTimer", 0, 'GREE_getStatus($_IPS[\'TARGET\']);');
+        $this->RegisterTimer("queue_WorkerTimer", 0, 'GREE_cmdQueueWorker($_IPS[\'TARGET\']);');
 
         $this->RequireParent("{82347F20-F541-41E1-AC5B-A636FD3AE2D8}");
     }
@@ -80,95 +80,95 @@ class GREEACWIFILEGACY extends IPSModule {
         $hasFreshAir = $this->ReadPropertyBoolean("freshAir");
 
         //Instanz ist aktiv
-        if(!IPS_VariableProfileExists('Sinclair.DeviceMode'))
-            IPS_CreateVariableProfile('Sinclair.DeviceMode', 1);
-        if(!IPS_VariableProfileExists('Sinclair.DeviceFan3'))
-            IPS_CreateVariableProfile('Sinclair.DeviceFan3', 1);
-        if(!IPS_VariableProfileExists('Sinclair.DeviceFan5'))
-            IPS_CreateVariableProfile('Sinclair.DeviceFan5', 1);
-        if(!IPS_VariableProfileExists('Sinclair.DeviceFan6'))
-            IPS_CreateVariableProfile('Sinclair.DeviceFan6', 1);
-        if(!IPS_VariableProfileExists('Sinclair.DeviceFan7'))
-            IPS_CreateVariableProfile('Sinclair.DeviceFan7', 1);
-        if(!IPS_VariableProfileExists('Sinclair.DeviceSwinger'))
-            IPS_CreateVariableProfile('Sinclair.DeviceSwinger', 1);
-        if(!IPS_VariableProfileExists('Sinclair.DeviceSwingerLeRi'))
-            IPS_CreateVariableProfile('Sinclair.DeviceSwingerLeRi', 1);
-        if(!IPS_VariableProfileExists('Sinclair.SetTemp'))
-            IPS_CreateVariableProfile('Sinclair.SetTemp', 1);
-        if(!IPS_VariableProfileExists('Sinclair.ActTemp'))
-            IPS_CreateVariableProfile('Sinclair.ActTemp', 1);
+        if(!IPS_VariableProfileExists('GREE.DeviceMode'))
+            IPS_CreateVariableProfile('GREE.DeviceMode', 1);
+        if(!IPS_VariableProfileExists('GREE.DeviceFan3'))
+            IPS_CreateVariableProfile('GREE.DeviceFan3', 1);
+        if(!IPS_VariableProfileExists('GREE.DeviceFan5'))
+            IPS_CreateVariableProfile('GREE.DeviceFan5', 1);
+        if(!IPS_VariableProfileExists('GREE.DeviceFan6'))
+            IPS_CreateVariableProfile('GREE.DeviceFan6', 1);
+        if(!IPS_VariableProfileExists('GREE.DeviceFan7'))
+            IPS_CreateVariableProfile('GREE.DeviceFan7', 1);
+        if(!IPS_VariableProfileExists('GREE.DeviceSwinger'))
+            IPS_CreateVariableProfile('GREE.DeviceSwinger', 1);
+        if(!IPS_VariableProfileExists('GREE.DeviceSwingerLeRi'))
+            IPS_CreateVariableProfile('GREE.DeviceSwingerLeRi', 1);
+        if(!IPS_VariableProfileExists('GREE.SetTemp'))
+            IPS_CreateVariableProfile('GREE.SetTemp', 1);
+        if(!IPS_VariableProfileExists('GREE.ActTemp'))
+            IPS_CreateVariableProfile('GREE.ActTemp', 1);
 
-        IPS_SetVariableProfileAssociation('Sinclair.DeviceMode', 0, $this->Translate("paDeviceMode-0"), 'Climate', -1);
-        IPS_SetVariableProfileAssociation('Sinclair.DeviceMode', 1, $this->Translate("paDeviceMode-1"), 'Snowflake', -1);
-        IPS_SetVariableProfileAssociation('Sinclair.DeviceMode', 2, $this->Translate("paDeviceMode-2"), 'Drops', -1);
-        IPS_SetVariableProfileAssociation('Sinclair.DeviceMode', 3, $this->Translate("paDeviceMode-3"), 'Ventilation', -1);
-        IPS_SetVariableProfileAssociation('Sinclair.DeviceMode', 4, $this->Translate("paDeviceMode-4"), 'Flame', -1);
+        IPS_SetVariableProfileAssociation('GREE.DeviceMode', 0, $this->Translate("paDeviceMode-0"), 'Climate', -1);
+        IPS_SetVariableProfileAssociation('GREE.DeviceMode', 1, $this->Translate("paDeviceMode-1"), 'Snowflake', -1);
+        IPS_SetVariableProfileAssociation('GREE.DeviceMode', 2, $this->Translate("paDeviceMode-2"), 'Drops', -1);
+        IPS_SetVariableProfileAssociation('GREE.DeviceMode', 3, $this->Translate("paDeviceMode-3"), 'Ventilation', -1);
+        IPS_SetVariableProfileAssociation('GREE.DeviceMode', 4, $this->Translate("paDeviceMode-4"), 'Flame', -1);
 
-        IPS_SetVariableProfileAssociation('Sinclair.DeviceFan3', 0, $this->Translate("paDeviceFan-0"), 'Ventilation', -1);
-        IPS_SetVariableProfileAssociation('Sinclair.DeviceFan3', 1, $this->Translate("paDeviceFan-1"), 'Speedo-0', -1);
-        IPS_SetVariableProfileAssociation('Sinclair.DeviceFan3', 2, $this->Translate("paDeviceFan-2"), 'Speedo-50', -1);
-        IPS_SetVariableProfileAssociation('Sinclair.DeviceFan3', 3, $this->Translate("paDeviceFan-3"), 'Speedo-100', -1);
+        IPS_SetVariableProfileAssociation('GREE.DeviceFan3', 0, $this->Translate("paDeviceFan-0"), 'Ventilation', -1);
+        IPS_SetVariableProfileAssociation('GREE.DeviceFan3', 1, $this->Translate("paDeviceFan-1"), 'Speedo-0', -1);
+        IPS_SetVariableProfileAssociation('GREE.DeviceFan3', 2, $this->Translate("paDeviceFan-2"), 'Speedo-50', -1);
+        IPS_SetVariableProfileAssociation('GREE.DeviceFan3', 3, $this->Translate("paDeviceFan-3"), 'Speedo-100', -1);
 
-        IPS_SetVariableProfileAssociation('Sinclair.DeviceFan5', 0, $this->Translate("paDeviceFan-0"), 'Ventilation', -1);
-        IPS_SetVariableProfileAssociation('Sinclair.DeviceFan5', 1, $this->Translate("paDeviceFan-1"), 'Speedo-0', -1);
-        IPS_SetVariableProfileAssociation('Sinclair.DeviceFan5', 2, $this->Translate("paDeviceFan-2"), 'Speedo-25', -1);
-        IPS_SetVariableProfileAssociation('Sinclair.DeviceFan5', 3, $this->Translate("paDeviceFan-3"), 'Speedo-50', -1);
-        IPS_SetVariableProfileAssociation('Sinclair.DeviceFan5', 4, $this->Translate("paDeviceFan-4"), 'Speedo-75', -1);
-        IPS_SetVariableProfileAssociation('Sinclair.DeviceFan5', 5, $this->Translate("paDeviceFan-5"), 'Speedo-100', -1);
+        IPS_SetVariableProfileAssociation('GREE.DeviceFan5', 0, $this->Translate("paDeviceFan-0"), 'Ventilation', -1);
+        IPS_SetVariableProfileAssociation('GREE.DeviceFan5', 1, $this->Translate("paDeviceFan-1"), 'Speedo-0', -1);
+        IPS_SetVariableProfileAssociation('GREE.DeviceFan5', 2, $this->Translate("paDeviceFan-2"), 'Speedo-25', -1);
+        IPS_SetVariableProfileAssociation('GREE.DeviceFan5', 3, $this->Translate("paDeviceFan-3"), 'Speedo-50', -1);
+        IPS_SetVariableProfileAssociation('GREE.DeviceFan5', 4, $this->Translate("paDeviceFan-4"), 'Speedo-75', -1);
+        IPS_SetVariableProfileAssociation('GREE.DeviceFan5', 5, $this->Translate("paDeviceFan-5"), 'Speedo-100', -1);
 
-        IPS_SetVariableProfileAssociation('Sinclair.DeviceFan6', 0, $this->Translate("paDeviceFan-0"), 'Ventilation', -1);
-        IPS_SetVariableProfileAssociation('Sinclair.DeviceFan6', 1, $this->Translate("paDeviceFan-1"), 'Speedo-0', -1);
-        IPS_SetVariableProfileAssociation('Sinclair.DeviceFan6', 2, $this->Translate("paDeviceFan-2"), 'Speedo-25', -1);
-        IPS_SetVariableProfileAssociation('Sinclair.DeviceFan6', 3, $this->Translate("paDeviceFan-3"), 'Speedo-50', -1);
-        IPS_SetVariableProfileAssociation('Sinclair.DeviceFan6', 4, $this->Translate("paDeviceFan-4"), 'Speedo-50', -1);
-        IPS_SetVariableProfileAssociation('Sinclair.DeviceFan6', 5, $this->Translate("paDeviceFan-5"), 'Speedo-75', -1);
-        IPS_SetVariableProfileAssociation('Sinclair.DeviceFan6', 6, $this->Translate("paDeviceFan-6"), 'Speedo-100', -1);
+        IPS_SetVariableProfileAssociation('GREE.DeviceFan6', 0, $this->Translate("paDeviceFan-0"), 'Ventilation', -1);
+        IPS_SetVariableProfileAssociation('GREE.DeviceFan6', 1, $this->Translate("paDeviceFan-1"), 'Speedo-0', -1);
+        IPS_SetVariableProfileAssociation('GREE.DeviceFan6', 2, $this->Translate("paDeviceFan-2"), 'Speedo-25', -1);
+        IPS_SetVariableProfileAssociation('GREE.DeviceFan6', 3, $this->Translate("paDeviceFan-3"), 'Speedo-50', -1);
+        IPS_SetVariableProfileAssociation('GREE.DeviceFan6', 4, $this->Translate("paDeviceFan-4"), 'Speedo-50', -1);
+        IPS_SetVariableProfileAssociation('GREE.DeviceFan6', 5, $this->Translate("paDeviceFan-5"), 'Speedo-75', -1);
+        IPS_SetVariableProfileAssociation('GREE.DeviceFan6', 6, $this->Translate("paDeviceFan-6"), 'Speedo-100', -1);
 
-        IPS_SetVariableProfileAssociation('Sinclair.DeviceFan7', 0, $this->Translate("paDeviceFan-0"), 'Ventilation', -1);
-        IPS_SetVariableProfileAssociation('Sinclair.DeviceFan7', 1, $this->Translate("paDeviceFan-1"), 'Speedo-0', -1);
-        IPS_SetVariableProfileAssociation('Sinclair.DeviceFan7', 2, $this->Translate("paDeviceFan-2"), 'Speedo-25', -1);
-        IPS_SetVariableProfileAssociation('Sinclair.DeviceFan7', 3, $this->Translate("paDeviceFan-3"), 'Speedo-25', -1);
-        IPS_SetVariableProfileAssociation('Sinclair.DeviceFan7', 4, $this->Translate("paDeviceFan-4"), 'Speedo-50', -1);
-        IPS_SetVariableProfileAssociation('Sinclair.DeviceFan7', 5, $this->Translate("paDeviceFan-5"), 'Speedo-75', -1);
-        IPS_SetVariableProfileAssociation('Sinclair.DeviceFan7', 6, $this->Translate("paDeviceFan-6"), 'Speedo-75', -1);
-        IPS_SetVariableProfileAssociation('Sinclair.DeviceFan7', 7, $this->Translate("paDeviceFan-7"), 'Speedo-100', -1);
+        IPS_SetVariableProfileAssociation('GREE.DeviceFan7', 0, $this->Translate("paDeviceFan-0"), 'Ventilation', -1);
+        IPS_SetVariableProfileAssociation('GREE.DeviceFan7', 1, $this->Translate("paDeviceFan-1"), 'Speedo-0', -1);
+        IPS_SetVariableProfileAssociation('GREE.DeviceFan7', 2, $this->Translate("paDeviceFan-2"), 'Speedo-25', -1);
+        IPS_SetVariableProfileAssociation('GREE.DeviceFan7', 3, $this->Translate("paDeviceFan-3"), 'Speedo-25', -1);
+        IPS_SetVariableProfileAssociation('GREE.DeviceFan7', 4, $this->Translate("paDeviceFan-4"), 'Speedo-50', -1);
+        IPS_SetVariableProfileAssociation('GREE.DeviceFan7', 5, $this->Translate("paDeviceFan-5"), 'Speedo-75', -1);
+        IPS_SetVariableProfileAssociation('GREE.DeviceFan7', 6, $this->Translate("paDeviceFan-6"), 'Speedo-75', -1);
+        IPS_SetVariableProfileAssociation('GREE.DeviceFan7', 7, $this->Translate("paDeviceFan-7"), 'Speedo-100', -1);
 
-        IPS_SetVariableProfileAssociation('Sinclair.DeviceSwinger', 0, $this->Translate("paDeviceSwinger-0"), '', -1);
-        IPS_SetVariableProfileAssociation('Sinclair.DeviceSwinger', 1, $this->Translate("paDeviceSwinger-1"), '', -1);
-        IPS_SetVariableProfileAssociation('Sinclair.DeviceSwinger', 2, $this->Translate("paDeviceSwinger-2"), '', -1);
-        IPS_SetVariableProfileAssociation('Sinclair.DeviceSwinger', 3, $this->Translate("paDeviceSwinger-3"), '', -1);
-        IPS_SetVariableProfileAssociation('Sinclair.DeviceSwinger', 4, $this->Translate("paDeviceSwinger-4"), '', -1);
-        IPS_SetVariableProfileAssociation('Sinclair.DeviceSwinger', 5, $this->Translate("paDeviceSwinger-5"), '', -1);
-        IPS_SetVariableProfileAssociation('Sinclair.DeviceSwinger', 6, $this->Translate("paDeviceSwinger-6"), '', -1);
-        IPS_SetVariableProfileAssociation('Sinclair.DeviceSwinger', 7, $this->Translate("paDeviceSwinger-7"), '', -1);
-        IPS_SetVariableProfileAssociation('Sinclair.DeviceSwinger', 8, $this->Translate("paDeviceSwinger-8"), '', -1);
-        IPS_SetVariableProfileAssociation('Sinclair.DeviceSwinger', 9, $this->Translate("paDeviceSwinger-9"), '', -1);
-        IPS_SetVariableProfileAssociation('Sinclair.DeviceSwinger', 10, $this->Translate("paDeviceSwinger-10"), '', -1);
-        IPS_SetVariableProfileAssociation('Sinclair.DeviceSwinger', 11, $this->Translate("paDeviceSwinger-11"), '', -1);
+        IPS_SetVariableProfileAssociation('GREE.DeviceSwinger', 0, $this->Translate("paDeviceSwinger-0"), '', -1);
+        IPS_SetVariableProfileAssociation('GREE.DeviceSwinger', 1, $this->Translate("paDeviceSwinger-1"), '', -1);
+        IPS_SetVariableProfileAssociation('GREE.DeviceSwinger', 2, $this->Translate("paDeviceSwinger-2"), '', -1);
+        IPS_SetVariableProfileAssociation('GREE.DeviceSwinger', 3, $this->Translate("paDeviceSwinger-3"), '', -1);
+        IPS_SetVariableProfileAssociation('GREE.DeviceSwinger', 4, $this->Translate("paDeviceSwinger-4"), '', -1);
+        IPS_SetVariableProfileAssociation('GREE.DeviceSwinger', 5, $this->Translate("paDeviceSwinger-5"), '', -1);
+        IPS_SetVariableProfileAssociation('GREE.DeviceSwinger', 6, $this->Translate("paDeviceSwinger-6"), '', -1);
+        IPS_SetVariableProfileAssociation('GREE.DeviceSwinger', 7, $this->Translate("paDeviceSwinger-7"), '', -1);
+        IPS_SetVariableProfileAssociation('GREE.DeviceSwinger', 8, $this->Translate("paDeviceSwinger-8"), '', -1);
+        IPS_SetVariableProfileAssociation('GREE.DeviceSwinger', 9, $this->Translate("paDeviceSwinger-9"), '', -1);
+        IPS_SetVariableProfileAssociation('GREE.DeviceSwinger', 10, $this->Translate("paDeviceSwinger-10"), '', -1);
+        IPS_SetVariableProfileAssociation('GREE.DeviceSwinger', 11, $this->Translate("paDeviceSwinger-11"), '', -1);
 
-        IPS_SetVariableProfileAssociation('Sinclair.DeviceSwingerLeRi', 0, $this->Translate("paDeviceSwingerLeRi-0"), '', -1);
-        IPS_SetVariableProfileAssociation('Sinclair.DeviceSwingerLeRi', 1, $this->Translate("paDeviceSwingerLeRi-1"), '', -1);
-        IPS_SetVariableProfileAssociation('Sinclair.DeviceSwingerLeRi', 2, $this->Translate("paDeviceSwingerLeRi-2"), '', -1);
-        IPS_SetVariableProfileAssociation('Sinclair.DeviceSwingerLeRi', 3, $this->Translate("paDeviceSwingerLeRi-3"), '', -1);
-        IPS_SetVariableProfileAssociation('Sinclair.DeviceSwingerLeRi', 4, $this->Translate("paDeviceSwingerLeRi-4"), '', -1);
-        IPS_SetVariableProfileAssociation('Sinclair.DeviceSwingerLeRi', 5, $this->Translate("paDeviceSwingerLeRi-5"), '', -1);
-        IPS_SetVariableProfileAssociation('Sinclair.DeviceSwingerLeRi', 6, $this->Translate("paDeviceSwingerLeRi-6"), '', -1);
+        IPS_SetVariableProfileAssociation('GREE.DeviceSwingerLeRi', 0, $this->Translate("paDeviceSwingerLeRi-0"), '', -1);
+        IPS_SetVariableProfileAssociation('GREE.DeviceSwingerLeRi', 1, $this->Translate("paDeviceSwingerLeRi-1"), '', -1);
+        IPS_SetVariableProfileAssociation('GREE.DeviceSwingerLeRi', 2, $this->Translate("paDeviceSwingerLeRi-2"), '', -1);
+        IPS_SetVariableProfileAssociation('GREE.DeviceSwingerLeRi', 3, $this->Translate("paDeviceSwingerLeRi-3"), '', -1);
+        IPS_SetVariableProfileAssociation('GREE.DeviceSwingerLeRi', 4, $this->Translate("paDeviceSwingerLeRi-4"), '', -1);
+        IPS_SetVariableProfileAssociation('GREE.DeviceSwingerLeRi', 5, $this->Translate("paDeviceSwingerLeRi-5"), '', -1);
+        IPS_SetVariableProfileAssociation('GREE.DeviceSwingerLeRi', 6, $this->Translate("paDeviceSwingerLeRi-6"), '', -1);
 
-        IPS_SetVariableProfileValues('Sinclair.SetTemp', 17, 27, 1);
-        IPS_SetVariableProfileText('Sinclair.SetTemp', '', '°C');
+        IPS_SetVariableProfileValues('GREE.SetTemp', 17, 27, 1);
+        IPS_SetVariableProfileText('GREE.SetTemp', '', '°C');
 
-        IPS_SetVariableProfileText('Sinclair.ActTemp', '', '°C');
+        IPS_SetVariableProfileText('GREE.ActTemp', '', '°C');
 
         $this->RegisterVariableString("name", $this->Translate("varName"), '', 1);
         $this->RegisterVariableBoolean("power", $this->Translate("varPower"), '~Switch', 2);
-        $this->RegisterVariableInteger("mode", $this->Translate("varMode"), 'Sinclair.DeviceMode', 3);
-        $this->RegisterVariableInteger("setTemp", $this->Translate("varSetTemp"), 'Sinclair.SetTemp', 4);
-        $this->RegisterVariableInteger("fan", $this->Translate("varFan"), 'Sinclair.DeviceFan'.$fanSteps, 5);
-        $this->RegisterVariableInteger("swinger", $this->Translate("varSwinger"), 'Sinclair.DeviceSwinger', 6);
+        $this->RegisterVariableInteger("mode", $this->Translate("varMode"), 'GREE.DeviceMode', 3);
+        $this->RegisterVariableInteger("setTemp", $this->Translate("varSetTemp"), 'GREE.SetTemp', 4);
+        $this->RegisterVariableInteger("fan", $this->Translate("varFan"), 'GREE.DeviceFan'.$fanSteps, 5);
+        $this->RegisterVariableInteger("swinger", $this->Translate("varSwinger"), 'GREE.DeviceSwinger', 6);
         if($hasSwingLeRi)
-            $this->RegisterVariableInteger("swingerLeRi", $this->Translate("varSwingerLeRi"), 'Sinclair.DeviceSwingerLeRi', 7);
-        $this->RegisterVariableInteger("actTemp", $this->Translate("varActTemp"), 'Sinclair.ActTemp', 8);
+            $this->RegisterVariableInteger("swingerLeRi", $this->Translate("varSwingerLeRi"), 'GREE.DeviceSwingerLeRi', 7);
+        $this->RegisterVariableInteger("actTemp", $this->Translate("varActTemp"), 'GREE.ActTemp', 8);
         $this->RegisterVariableBoolean("optXFan", $this->Translate("varOptXFan"), '~Switch', 9);
         $this->RegisterVariableBoolean("optHealth", $this->Translate("varOptHealth"), '~Switch', 10);
         $this->RegisterVariableBoolean("optLight", $this->Translate("varOptLight"), '~Switch', 11);
@@ -215,7 +215,7 @@ class GREEACWIFILEGACY extends IPSModule {
 
         $statusInterval = $this->ReadPropertyInteger("statusTimer");
 
-        $this->SetBuffer("actualCommand", Commands::none);
+        $this->SetBuffer("actualCommand", GREECommands::none);
         $this->SetBuffer('cmdQueue', serialize(array()));
 
         if($this->ReadPropertyBoolean("active")){
@@ -279,7 +279,7 @@ class GREEACWIFILEGACY extends IPSModule {
     }
 
     public function ReceiveData($JSONString){
-        $this->log('ReceiveData', 'Received data: ' . $JSONString, LogType::INFO);
+        $this->log('ReceiveData', 'Received data: ' . $JSONString, GREELogType::INFO);
         $actCmd = $this->GetBuffer('actualCommand');
         $recObj = json_decode($JSONString);
         $bufferObj = json_decode($recObj->Buffer);
@@ -287,27 +287,27 @@ class GREEACWIFILEGACY extends IPSModule {
         if (isset($bufferObj->tag)) {
             $encryptionType = 'GCM';
         }
-        $this->log('ReceiveData', 'Encryption Type: ' . $encryptionType, LogType::INFO);
+        $this->log('ReceiveData', 'Encryption Type: ' . $encryptionType, GREELogType::INFO);
         // Default-Key je nach Modus
-        if ($actCmd < Commands::status) {
+        if ($actCmd < GREECommands::status) {
             $key = ($encryptionType === 'GCM') ? self::defaultGcmKey : self::defaultCryptKey;
         } else {
             $key = GetValueString($this->GetIDForIdent('deviceKey'));
         }
-        $this->log('ReceiveData', 'Using key: ' . $key, LogType::INFO);
+        $this->log('ReceiveData', 'Using key: ' . $key, GREELogType::INFO);
         if ($encryptionType === 'GCM') {
             $decrypted = $this->decryptGCM($bufferObj->pack, $bufferObj->tag ?? '', $key);
-            
+
         } else {
             $decrypted = $this->decrpyt($bufferObj->pack, $key);
         }
-        $this->log('ReceiveData', 'Decrypted data: ' . $decrypted, LogType::INFO);
+        $this->log('ReceiveData', 'Decrypted data: ' . $decrypted, GREELogType::INFO);
         $decObj = json_decode($decrypted);
 
         switch($actCmd){
-            case Commands::scan:
+            case GREECommands::scan:
                 if (!is_object($decObj) || !property_exists($decObj, 'mac') || $decObj->mac === null) {
-                    $this->log('ReceiveData', 'Fehler: Feld "mac" fehlt oder ist null! Decrypted: ' . print_r($decrypted, true), LogType::ERROR);
+                    $this->log('ReceiveData', 'Fehler: Feld "mac" fehlt oder ist null! Decrypted: ' . print_r($decrypted, true), GREELogType::ERROR);
                     return;
                 }
                 $mac = strtoupper(implode(':', str_split($decObj->mac, 2)));
@@ -317,21 +317,21 @@ class GREEACWIFILEGACY extends IPSModule {
                 $this->reduceCmdQueue();
                 $this->deviceBind();
                 break;
-            case Commands::bind:
+            case GREECommands::bind:
                 SetValueString($this->GetIDForIdent('deviceKey'), $decObj->key);
 
                 SetValueString($this->GetIDForIdent('lastUpdate'), 'bind '.date("Y-m-d H:i:s"));
 
                 $this->reduceCmdQueue();
                 break;
-            case Commands::status:
+            case GREECommands::status:
                 $this->parseStatus($decObj->cols, $decObj->dat);
 
                 SetValueString($this->GetIDForIdent('lastUpdate'), date("Y-m-d H:i:s"));
 
                 $this->reduceCmdQueue();
                 break;
-            case Commands::cmd:
+            case GREECommands::cmd:
                 $this->parseStatus($decObj->opt, $decObj->p);
 
                 $this->reduceCmdQueue();
@@ -340,28 +340,28 @@ class GREEACWIFILEGACY extends IPSModule {
     }
 
     private function sendCommand($type, $cmdArr){
-        $this->log('sendCommand', 'send command: '.$type.' with data: '.json_encode($cmdArr), LogType::INFO);
+        $this->log('sendCommand', 'send command: '.$type.' with data: '.json_encode($cmdArr), GREELogType::INFO);
         $cmdQueue = $this->getCmdQueue();
         $bAddCmd = true;
 
         // add the status command only once in queue
-        if($type == Commands::status){
+        if($type == GREECommands::status){
             foreach($cmdQueue as $cmd){
-                if($cmd['TYPE'] == Commands::status){
+                if($cmd['TYPE'] == GREECommands::status){
                     $bAddCmd = false;
-                    $this->log('sendCommand', 'status command already in queue', LogType::INFO);
+                    $this->log('sendCommand', 'status command already in queue', GREELogType::INFO);
                     break;
                 }
             }
         }
         if(count($cmdQueue) > 5) {
-            $this->log('sendCommand', 'more then 5 commands in queue', LogType::INFO);
+            $this->log('sendCommand', 'more then 5 commands in queue', GREELogType::INFO);
             $bAddCmd = false;
         }
 
         // empty queue if init or bind commands are sent
-        if($type == Commands::scan || $type == Commands::bind){
-            $this->log('sendCommand', 'sending '.($type == Commands::scan ? 'init' : 'bind').' command -> empty queue', LogType::INFO);
+        if($type == GREECommands::scan || $type == GREECommands::bind){
+            $this->log('sendCommand', 'sending '.($type == GREECommands::scan ? 'init' : 'bind').' command -> empty queue', GREELogType::INFO);
             $this->resetCmd();
             $cmdQueue = array();
             $bAddCmd = true;
@@ -389,7 +389,7 @@ class GREEACWIFILEGACY extends IPSModule {
         }
 
         // while waiting for response send no other command
-        if($this->GetBuffer('actualCommand') != Commands::none){
+        if($this->GetBuffer('actualCommand') != GREECommands::none){
             $cmdWaitingTimeMilliSecs = (microtime(true) - $cmdQueue[0]['TIMESTAMP'])*1000;
 
             if($cmdWaitingTimeMilliSecs >= 10000) {
@@ -408,25 +408,25 @@ class GREEACWIFILEGACY extends IPSModule {
             $this->SetBuffer('actualCommand', $type);
             $cmdQueue[0]['TIMESTAMP'] = microtime(true);
             $this->setCmdQueue($cmdQueue);
-            if ($type == Commands::scan) {
+            if ($type == GREECommands::scan) {
                 // Scan/initDevice: Sende per Broadcast und leite Antwort an ReceiveData
                 $json = json_encode($cmdArr);
                 $broadcastIp = $this->ReadPropertyString("broadcastAddress");
                 $response = $this->sendBroadcast($json, $broadcastIp, 7000);
                 if ($response !== false) {
-                    $this->log('cmdQueueWorker', 'Broadcast-Response: ' . $response, LogType::INFO);
+                    $this->log('cmdQueueWorker', 'Broadcast-Response: ' . $response, GREELogType::INFO);
                     $this->ReceiveData(json_encode([
                         "Buffer" => $response
                     ]));
                 } else {
-                    $this->log('cmdQueueWorker', 'Keine Antwort auf Broadcast erhalten.', LogType::ERROR);
+                    $this->log('cmdQueueWorker', 'Keine Antwort auf Broadcast erhalten.', GREELogType::ERROR);
                 }
             } else {
                 $this->SendDataToParent(json_encode(Array("DataID" => "{79827379-F36E-4ADA-8A95-5F8D1DC92FA9}", "Buffer" => json_encode($cmdArr))));
-                $this->log('QueueWorker', 'send command: '.$type.' with data: '.json_encode($cmdArr), LogType::INFO);
+                $this->log('QueueWorker', 'send command: '.$type.' with data: '.json_encode($cmdArr), GREELogType::INFO);
             }
         }catch (Exception $e){
-            $this->log('QueueWorker', $e->getMessage(), LogType::ERROR);
+            $this->log('QueueWorker', $e->getMessage(), GREELogType::ERROR);
 
             // set to none command to prevent blocking
             $this->resetCmd();
@@ -453,7 +453,7 @@ class GREEACWIFILEGACY extends IPSModule {
         $this->SetBuffer('cmdQueue', serialize($queue));
     }
     private function resetCmd(){
-        $this->SetBuffer('actualCommand', Commands::none);
+        $this->SetBuffer('actualCommand', GREECommands::none);
     }
     public function resetCmdQueue(){
         $cmdQueue = array();
@@ -463,7 +463,7 @@ class GREEACWIFILEGACY extends IPSModule {
 
     public function initDevice(){
         $arr = array('t' => 'scan');
-        $this->sendCommand(Commands::scan, $arr);
+        $this->sendCommand(GREECommands::scan, $arr);
     }
 
     private function deviceBind(){
@@ -472,7 +472,7 @@ class GREEACWIFILEGACY extends IPSModule {
             'uid' => 0,
             'mac' => $this->getMacUnformatted()
         );
-        $this->sendCommand(Commands::bind, $this->getRequest($pack, true));
+        $this->sendCommand(GREECommands::bind, $this->getRequest($pack, true));
     }
     public function getStatus(){
         // if no device key or last change is older then 15 minutes -> init
@@ -481,34 +481,34 @@ class GREEACWIFILEGACY extends IPSModule {
         $maxAge = $this->ReadPropertyInteger('statusTimer') * 15;
         if(empty(GetValueString($this->GetIDForIdent('deviceKey')))
             || ($maxAge > 0 && $lastStatusUpdateAgeSec > $maxAge)){
-            $this->log('getStatus', 'device key is empty or last update is more than '.$maxAge.' seconds ago -> init device', LogType::INFO);
+            $this->log('getStatus', 'device key is empty or last update is more than '.$maxAge.' seconds ago -> init device', GREELogType::INFO);
             $this->initDevice();
             return;
         }
 
         $cols = array();
-        $cols[] = DeviceParam::Power;
-        $cols[] = DeviceParam::Mode;
-        $cols[] = DeviceParam::SetTemperature;
-        $cols[] = DeviceParam::ActTemperature;
-        $cols[] = DeviceParam::Fanspeed;
-        $cols[] = DeviceParam::Swinger;
+        $cols[] = GREEDeviceParam::Power;
+        $cols[] = GREEDeviceParam::Mode;
+        $cols[] = GREEDeviceParam::SetTemperature;
+        $cols[] = GREEDeviceParam::ActTemperature;
+        $cols[] = GREEDeviceParam::Fanspeed;
+        $cols[] = GREEDeviceParam::Swinger;
         if($this->ReadPropertyBoolean("swingLeRi"))
-            $cols[] = DeviceParam::SwingerLeRi;
+            $cols[] = GREEDeviceParam::SwingerLeRi;
         if($this->ReadPropertyBoolean("freshAir"))
-            $cols[] = DeviceParam::OptAir;
-        $cols[] = DeviceParam::OptXFan;
-        $cols[] = DeviceParam::OptEco;
-        $cols[] = DeviceParam::OptHealth;
-        $cols[] = DeviceParam::OptLight;
-        $cols[] = DeviceParam::OptSleep1;
+            $cols[] = GREEDeviceParam::OptAir;
+        $cols[] = GREEDeviceParam::OptXFan;
+        $cols[] = GREEDeviceParam::OptEco;
+        $cols[] = GREEDeviceParam::OptHealth;
+        $cols[] = GREEDeviceParam::OptLight;
+        $cols[] = GREEDeviceParam::OptSleep1;
 
         $pack = array(
             't' => 'status',
             'mac' => $this->getMacUnformatted(),
             'cols' => $cols
         );
-        $this->sendCommand(Commands::status, $this->getRequest($pack, false));
+        $this->sendCommand(GREECommands::status, $this->getRequest($pack, false));
     }
 
     public function setPower(bool $newVal){
@@ -519,19 +519,19 @@ class GREEACWIFILEGACY extends IPSModule {
         if($this->ReadPropertyBoolean("autoLight"))
             $newOptLight = $newVal;
 
-        $opts[] = DeviceParam::Power;
-        $opts[] = DeviceParam::OptSleep1;
-        $opts[] = DeviceParam::OptSleep2;
-        $opts[] = DeviceParam::Mode;
-        $opts[] = DeviceParam::Fanspeed;
-        $opts[] = DeviceParam::OptQuiet;
-        $opts[] = DeviceParam::OptTurbo;
-        $opts[] = DeviceParam::Swinger;
-        $opts[] = DeviceParam::SetTemperature;
-        $opts[] = DeviceParam::OptXFan;
-        $opts[] = DeviceParam::OptHealth;
-        $opts[] = DeviceParam::OptLight;
-        $opts[] = DeviceParam::OptEco;
+        $opts[] = GREEDeviceParam::Power;
+        $opts[] = GREEDeviceParam::OptSleep1;
+        $opts[] = GREEDeviceParam::OptSleep2;
+        $opts[] = GREEDeviceParam::Mode;
+        $opts[] = GREEDeviceParam::Fanspeed;
+        $opts[] = GREEDeviceParam::OptQuiet;
+        $opts[] = GREEDeviceParam::OptTurbo;
+        $opts[] = GREEDeviceParam::Swinger;
+        $opts[] = GREEDeviceParam::SetTemperature;
+        $opts[] = GREEDeviceParam::OptXFan;
+        $opts[] = GREEDeviceParam::OptHealth;
+        $opts[] = GREEDeviceParam::OptLight;
+        $opts[] = GREEDeviceParam::OptEco;
 
         $vals[] = $newVal ? 1 : 0;
         $vals[] = 0;
@@ -548,69 +548,69 @@ class GREEACWIFILEGACY extends IPSModule {
         $vals[] = GetValueBoolean($this->GetIDForIdent('optEco')) ? 1 : 0;
 
         if($this->ReadPropertyBoolean("swingLeRi")) {
-            $opts[] = DeviceParam::SwingerLeRi;
+            $opts[] = GREEDeviceParam::SwingerLeRi;
             $vals[] = GetValueInteger($this->GetIDForIdent('swingerLeRi'));
         }
         if($this->ReadPropertyBoolean("freshAir")) {
-            $opts[] = DeviceParam::OptAir;
+            $opts[] = GREEDeviceParam::OptAir;
             $vals[] = GetValueInteger($this->GetIDForIdent('optAir'));
         }
 
         $cmd = $this->getCommand($opts, $vals);
-        $this->sendCommand(Commands::cmd, $this->getRequest($cmd, false));
+        $this->sendCommand(GREECommands::cmd, $this->getRequest($cmd, false));
     }
     public function setMode(int $newVal){
-        $cmd = $this->getCommand(array(DeviceParam::Mode), array($newVal));
-        $this->sendCommand(Commands::cmd, $this->getRequest($cmd, false));
+        $cmd = $this->getCommand(array(GREEDeviceParam::Mode), array($newVal));
+        $this->sendCommand(GREECommands::cmd, $this->getRequest($cmd, false));
     }
     public function setFan(int $newVal){
         if($newVal < 0 || $newVal > $this->ReadPropertyInteger("fanSteps"))
             return;
 
-        $cmd = $this->getCommand(array(DeviceParam::Fanspeed, "Quiet", "Tur"), array($newVal, 0, 0));
-        $this->sendCommand(Commands::cmd, $this->getRequest($cmd, false));
+        $cmd = $this->getCommand(array(GREEDeviceParam::Fanspeed, "Quiet", "Tur"), array($newVal, 0, 0));
+        $this->sendCommand(GREECommands::cmd, $this->getRequest($cmd, false));
     }
     public function setSwinger(int $newVal){
         if($newVal < 0 || $newVal > 11)
             return;
 
-        $cmd = $this->getCommand(array(DeviceParam::Swinger), array($newVal));
-        $this->sendCommand(Commands::cmd, $this->getRequest($cmd, false));
+        $cmd = $this->getCommand(array(GREEDeviceParam::Swinger), array($newVal));
+        $this->sendCommand(GREECommands::cmd, $this->getRequest($cmd, false));
     }
     public function setSwingerLeRi(int $newVal){
         if($newVal < 0 || $newVal > 6)
             return;
 
-        $cmd = $this->getCommand(array(DeviceParam::SwingerLeRi), array($newVal));
-        $this->sendCommand(Commands::cmd, $this->getRequest($cmd, false));
+        $cmd = $this->getCommand(array(GREEDeviceParam::SwingerLeRi), array($newVal));
+        $this->sendCommand(GREECommands::cmd, $this->getRequest($cmd, false));
     }
     public function setTemp(int $newVal){
-        $cmd = $this->getCommand(array(DeviceParam::SetTemperature), array($newVal));
-        $this->sendCommand(Commands::cmd, $this->getRequest($cmd, false));
+        $cmd = $this->getCommand(array(GREEDeviceParam::SetTemperature), array($newVal));
+        $this->sendCommand(GREECommands::cmd, $this->getRequest($cmd, false));
     }
     public function setOptXFan(bool $newVal){
-        $cmd = $this->getCommand(array(DeviceParam::OptXFan), array($newVal ? 1 : 0));
-        $this->sendCommand(Commands::cmd, $this->getRequest($cmd, false));
+        $cmd = $this->getCommand(array(GREEDeviceParam::OptXFan), array($newVal ? 1 : 0));
+        $this->sendCommand(GREECommands::cmd, $this->getRequest($cmd, false));
     }
     public function setOptHealth(bool $newVal){
-        $cmd = $this->getCommand(array(DeviceParam::OptHealth), array($newVal ? 1 : 0));
-        $this->sendCommand(Commands::cmd, $this->getRequest($cmd, false));
+        $cmd = $this->getCommand(array(GREEDeviceParam::OptHealth), array($newVal ? 1 : 0));
+        $this->sendCommand(GREECommands::cmd, $this->getRequest($cmd, false));
     }
     public function setOptLight(bool $newVal){
-        $cmd = $this->getCommand(array(DeviceParam::OptLight), array($newVal ? 1 : 0));
-        $this->sendCommand(Commands::cmd, $this->getRequest($cmd, false));
+        $cmd = $this->getCommand(array(GREEDeviceParam::OptLight), array($newVal ? 1 : 0));
+        $this->sendCommand(GREECommands::cmd, $this->getRequest($cmd, false));
     }
     public function setOptSleep(bool $newVal){
-        $cmd = $this->getCommand(array(DeviceParam::OptSleep1, DeviceParam::OptSleep2), array($newVal ? 1 : 0, $newVal ? 1 : 0));
-        $this->sendCommand(Commands::cmd, $this->getRequest($cmd, false));
+        $cmd = $this->getCommand(array(GREEDeviceParam::OptSleep1, GREEDeviceParam::OptSleep2), array($newVal ? 1 : 0, $newVal ? 1 : 0));
+        $this->sendCommand(GREECommands::cmd, $this->getRequest($cmd, false));
     }
     public function setOptEco(bool $newVal){
-        $cmd = $this->getCommand(array(DeviceParam::OptEco), array($newVal ? 1 : 0));
-        $this->sendCommand(Commands::cmd, $this->getRequest($cmd, false));
+        $cmd = $this->getCommand(array(GREEDeviceParam::OptEco), array($newVal ? 1 : 0));
+        $this->sendCommand(GREECommands::cmd, $this->getRequest($cmd, false));
     }
     public function setOptAir(bool $newVal){
-        $cmd = $this->getCommand(array(DeviceParam::OptAir), array($newVal ? 1 : 0));
-        $this->sendCommand(Commands::cmd, $this->getRequest($cmd, false));
+        $cmd = $this->getCommand(array(GREEDeviceParam::OptAir), array($newVal ? 1 : 0));
+        $this->sendCommand(GREECommands::cmd, $this->getRequest($cmd, false));
     }
 
     public function beep(){
@@ -620,45 +620,45 @@ class GREEACWIFILEGACY extends IPSModule {
     private function parseStatus($cols, $dats){
         for($i=0;$i<count($cols);$i++){
             switch($cols[$i]){
-                case DeviceParam::Power:
+                case GREEDeviceParam::Power:
                     SetValueBoolean($this->GetIDForIdent('power'), $dats[$i]!=0 ? true : false);
                     break;
-                case DeviceParam::Mode:
+                case GREEDeviceParam::Mode:
                     SetValueInteger($this->GetIDForIdent('mode'), $dats[$i]);
                     break;
-                case DeviceParam::Fanspeed:
+                case GREEDeviceParam::Fanspeed:
                     SetValueInteger($this->GetIDForIdent('fan'), $dats[$i]);
                     break;
-                case DeviceParam::Swinger:
+                case GREEDeviceParam::Swinger:
                     SetValueInteger($this->GetIDForIdent('swinger'), $dats[$i]);
                     break;
-                case DeviceParam::SwingerLeRi:
+                case GREEDeviceParam::SwingerLeRi:
                     if($this->ReadPropertyBoolean("swingLeRi"))
                         SetValueInteger($this->GetIDForIdent('swingerLeRi'), $dats[$i]);
                     break;
-                case DeviceParam::SetTemperature:
+                case GREEDeviceParam::SetTemperature:
                     SetValueInteger($this->GetIDForIdent('setTemp'), $dats[$i]);
                     break;
-                case DeviceParam::ActTemperature:
+                case GREEDeviceParam::ActTemperature:
                     SetValueInteger($this->GetIDForIdent('actTemp'), $dats[$i]-40);
                     break;
-                case DeviceParam::OptXFan:
+                case GREEDeviceParam::OptXFan:
                     SetValueBoolean($this->GetIDForIdent('optXFan'), $dats[$i]!=0 ? true : false);
                     break;
-                case DeviceParam::OptHealth:
+                case GREEDeviceParam::OptHealth:
                     SetValueBoolean($this->GetIDForIdent('optHealth'), $dats[$i]!=0 ? true : false);
                     break;
-                case DeviceParam::OptLight:
+                case GREEDeviceParam::OptLight:
                     SetValueBoolean($this->GetIDForIdent('optLight'), $dats[$i]!=0 ? true : false);
                     break;
-                case DeviceParam::OptSleep1:
-                case DeviceParam::OptSleep2:
+                case GREEDeviceParam::OptSleep1:
+                case GREEDeviceParam::OptSleep2:
                     SetValueBoolean($this->GetIDForIdent('optSleep'), $dats[$i]!=0 ? true : false);
                     break;
-                case DeviceParam::OptEco:
+                case GREEDeviceParam::OptEco:
                     SetValueBoolean($this->GetIDForIdent('optEco'), $dats[$i]!=0 ? true : false);
                     break;
-                case DeviceParam::OptAir:
+                case GREEDeviceParam::OptAir:
                     if($this->ReadPropertyBoolean("freshAir"))
                         SetValueBoolean($this->GetIDForIdent('optAir'), $dats[$i]!=0 ? true : false);
                     break;
@@ -677,7 +677,7 @@ class GREEACWIFILEGACY extends IPSModule {
             $key = GetValueString($this->GetIDForIdent('deviceKey'));
         }
         $strPack = json_encode($pack);
-        $this->log('getRequest', 'Using encryption type: ' . $encryptionType . ' - Pack: ' . $strPack, LogType::INFO);
+        $this->log('getRequest', 'Using encryption type: ' . $encryptionType . ' - Pack: ' . $strPack, GREELogType::INFO);
         if ($encryptionType === 'GCM') {
             $enc = $this->encryptGCM($strPack, $key);
             $arr = array(
@@ -795,7 +795,7 @@ class GREEACWIFILEGACY extends IPSModule {
     private function sendBroadcast($data, $broadcastIp, $port = 7000) {
         $sock = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
         if ($sock === false) {
-            $this->log('sendBroadcast', 'Socket konnte nicht erstellt werden: ' . socket_strerror(socket_last_error()), LogType::ERROR);
+            $this->log('sendBroadcast', 'Socket konnte nicht erstellt werden: ' . socket_strerror(socket_last_error()), GREELogType::ERROR);
             return false;
         }
         socket_set_option($sock, SOL_SOCKET, SO_BROADCAST, 1);
@@ -812,7 +812,7 @@ class GREEACWIFILEGACY extends IPSModule {
     private function log($name, $data, $logLevel){
         $bLog = true;
 
-        if($logLevel == LogType::INFO && !$this->ReadPropertyBoolean("logInfo"))
+        if($logLevel == GREELogType::INFO && !$this->ReadPropertyBoolean("logInfo"))
             $bLog = false;
 
         if($bLog)
@@ -833,7 +833,7 @@ class GREEACWIFILEGACY extends IPSModule {
             $instance = IPS_GetInstance($id);
             $parent = $instance['ConnectionID'];
         } else {
-            $this->log('GetParent', "Instance #$id doesn't exists", LogType::ERROR);
+            $this->log('GetParent', "Instance #$id doesn't exists", GREELogType::ERROR);
         }
         return $parent;
     }
