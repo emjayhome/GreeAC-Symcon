@@ -36,7 +36,7 @@ abstract class LogType
 }
 
 // Klassendefinition
-class sinclair extends IPSModule {
+class GREEACWIFI extends IPSModule {
     const defaultCryptKey = 'a3K8Bx%2r8Y7#xDh';
     const defaultGcmKey = '{yxAHAY_Lm6pbC/<';
     const GCM_IV = "5440784449675a516c5e6313"; // hex-encoded, 12 bytes
