@@ -1,10 +1,12 @@
-# Symcon Sinclair/Gree Klimaanlagen Modul
+# GREE Air Condition Module für IP-Symcon
 
 Maintainer: **EmJayHome** ([GitHub: emjayhome](https://github.com/emjayhome)).
 
 Dieses eigenständig veröffentlichte Modul basiert ursprünglich auf dem Modul [GreeAC-Symcon von emtek-at](https://github.com/emtek-at/GreeAC-Symcon) und wurde unter anderem um AES-128-GCM-Unterstützung erweitert. Der Fork hat eigene IP-Symcon-Bibliotheks- und Modul-UUIDs.
 
 Modul um Klimaanlagen mit Wifi Modul der Hersteller Gree zu steuern.
+
+Für neue Installationen ist **GREE AC WIFI** mit dem Präfix `GREE` und der Modul-ID `{A86CE842-B03D-429C-B633-E5CF550592B7}` vorgesehen. Der ältere Eintrag **GREE AC WIFI Legacy** bleibt unter seiner bisherigen Modul-ID `{74450BAA-459C-4042-8A4C-BF7DDA175259}` verfügbar, damit bestehende Instanzen und Skripte mit dem Präfix `SINCLAIR` weiter funktionieren. Bestehende Instanzen werden nicht automatisch auf die neue Modul-ID migriert.
 
 Unterstützte Marken:
 - Sinclair
@@ -48,10 +50,12 @@ Falls das Gerät für die Dauer von 15*[getStatus Intervall Sek] nicht pingbar i
 Über das Modul-Control folgende URL hinzufügen.  
 `https://github.com/emjayhome/GreeAC-Symcon`
 
+Bei einem Update erhalten bestehende Instanzen weiterhin die Legacy-Modul-ID. Um eine Instanz auf **GREE AC WIFI** umzustellen, muss eine neue Instanz angelegt und mit denselben Geräte- und Verbindungseinstellungen konfiguriert werden. Anschließend sind Skripte, Visualisierungen und Links auf die neue Instanz bzw. deren Variablen umzustellen. Die Legacy-Instanz sollte erst gelöscht werden, wenn die neue Instanz geprüft und alle Verwendungen migriert wurden.
+
 
 ### 4. Einrichten der Instanzen in IP-Symcon
 
-- Unter "Instanz hinzufügen" ist das 'GREE AC WIFI'-Modul unter dem Hersteller 'Sinclair' aufgeführt.
+- Unter "Instanz hinzufügen" ist das 'GREE AC WIFI'-Modul unter dem Hersteller 'GREE' aufgeführt. Für vorhandene Installationen bleibt zusätzlich 'GREE AC WIFI Legacy' verfügbar.
 
 #### 4.1 Gateway konfigurieren
 __Konfigurationsseite__:
@@ -104,15 +108,15 @@ DeviceKey           | String  | Key für die Verschlüsselung der Kommunikation.
 
 Nachfolgende Profile werden zusätzlich hinzugefügt und bei jedem "Änderungen übernehmen" der Instanz neu abgespeichert:
 
-* Sinclair.DeviceMode
-* Sinclair.DeviceFan3
-* Sinclair.DeviceFan5
-* Sinclair.DeviceFan6
-* Sinclair.DeviceFan7
-* Sinclair.DeviceSwinger
-* Sinclair.DeviceSwingerLeRi
-* Sinclair.SetTemp
-* Sinclair.ActTemp
+* GREE.DeviceMode
+* GREE.DeviceFan3
+* GREE.DeviceFan5
+* GREE.DeviceFan6
+* GREE.DeviceFan7
+* GREE.DeviceSwinger
+* GREE.DeviceSwingerLeRi
+* GREE.SetTemp
+* GREE.ActTemp
 
 ### 6. WebFront
 
@@ -120,21 +124,21 @@ Die Instanz wird im WebFront angezeigt. Sie können die vorhandenen Funktionen n
 
 ### 7. PHP-Befehlsreferenz
 
-Präfix des Moduls 'SINCLAIR'
+Präfix des neuen Moduls 'GREE'. Der Kompatibilitätseintrag für bestehende Instanzen verwendet weiterhin 'SINCLAIR'.
 
-`SINCLAIR_initDevice(integer $instanceId)`
+`GREE_initDevice(integer $instanceId)`
 
 Holt den DeviceKey vom Gerät, damit Kommandos gesendet werden können. Wird automatisch aufgerufen wenn der DeviceKey leer ist.
 
-`SINCLAIR_getStatus(integer $instanceId)`
+`GREE_getStatus(integer $instanceId)`
 
 Fragt die Daten vom Gerät ab. Diese Funktion wird vom Timer aufgerufen.
 
-`SINCLAIR_setPower(integer $instanceId, bool $newVal)`
+`GREE_setPower(integer $instanceId, bool $newVal)`
 
-Schaltet das Gerät ein oder aus und setzt alle Optionen wie sie in Symcon eingestellt sind. Möchte man mehrere Variablen gleichzeitig zum Gerät schicken, können diese in IP-Symcon mit `SetValue` gesetzt werden und anschließend mit `SINCLAIR_setPower` übertragen werden. Der Vorteil ist, dass das Gerät nur einmal piepst und nicht für jede Option einzeln.
+Schaltet das Gerät ein oder aus und setzt alle Optionen wie sie in Symcon eingestellt sind. Möchte man mehrere Variablen gleichzeitig zum Gerät schicken, können diese in IP-Symcon mit `SetValue` gesetzt werden und anschließend mit `GREE_setPower` übertragen werden. Der Vorteil ist, dass das Gerät nur einmal piepst und nicht für jede Option einzeln.
 
-`SINCLAIR_setMode(integer $instanceId, int $newVal)`
+`GREE_setMode(integer $instanceId, int $newVal)`
 
 Setzt den Modus. Mögliche Werte:
 * 0: Auto
@@ -143,13 +147,13 @@ Setzt den Modus. Mögliche Werte:
 * 3: Lüften
 * 4: Heizen
 
-`SINCLAIR_setFan(integer $instanceId, int $newVal)`
+`GREE_setFan(integer $instanceId, int $newVal)`
 
 Setzt die Gebläsegeschwindigkeit. Mögliche Werte je nach Konfiguration:
 * 0: Auto
 * 1-7: Geschwindigkeit
 
-`SINCLAIR_setSwinger(integer $instanceId, int $newVal)`
+`GREE_setSwinger(integer $instanceId, int $newVal)`
 
 Setzt die Gebläserichtung. Mögliche Werte je nach Konfiguration:
 * 0: Stopp
@@ -165,7 +169,7 @@ Setzt die Gebläserichtung. Mögliche Werte je nach Konfiguration:
 * 10: Swing Oben -> Unten Mitte
 * 11: Swing Oben -> Mitte
 
-`SINCLAIR_setSwingerLeRi(integer $instanceId, int $newVal)`
+`GREE_setSwingerLeRi(integer $instanceId, int $newVal)`
 
 Setzt die Gebläserichtung Links Rechts. Mögliche Werte je nach Konfiguration:
 * 0: Stopp
@@ -176,38 +180,40 @@ Setzt die Gebläserichtung Links Rechts. Mögliche Werte je nach Konfiguration:
 * 5: Fix Rechts Mitte
 * 6: Fix Rechts
 
-`SINCLAIR_setTemp(integer $instanceId, int $newVal)`
+`GREE_setTemp(integer $instanceId, int $newVal)`
 
 Setzt die Solltemperatur.
 
-`SINCLAIR_setOptXFan(integer $instanceId, bool $newVal)`
+`GREE_setOptXFan(integer $instanceId, bool $newVal)`
 
 Schaltet den Gebläsenachlauf ein oder aus.
 
-`SINCLAIR_setOptHealth(integer $instanceId, bool $newVal)`
+`GREE_setOptHealth(integer $instanceId, bool $newVal)`
 
 Schaltet den Ionisator ein oder aus.
 
-`SINCLAIR_setOptLight(integer $instanceId, bool $newVal)`
+`GREE_setOptLight(integer $instanceId, bool $newVal)`
 
 Schaltet die Displaybeleuchtung ein oder aus.
 
-`SINCLAIR_setOptSleep(integer $instanceId, bool $newVal)`
+`GREE_setOptSleep(integer $instanceId, bool $newVal)`
 
 Schaltet den Schlafmodus ein oder aus.
 
-`SINCLAIR_setOptEco(integer $instanceId, bool $newVal)`
+`GREE_setOptEco(integer $instanceId, bool $newVal)`
 
 Schaltet den Ecomodus ein oder aus.
 
-`SINCLAIR_setOptAir(integer $instanceId, bool $newVal)`
+`GREE_setOptAir(integer $instanceId, bool $newVal)`
 
 Schaltet das Frischluftventil ein oder aus.
 
-`SINCLAIR_beep(integer $instanceId)`
+`GREE_beep(integer $instanceId)`
 
 Lässt das Gerät einmal piepsen.
 
-`SINCLAIR_resetCmdQueue(integer $instanceId)`
+`GREE_resetCmdQueue(integer $instanceId)`
 
 Leert die Commandqueue falls Probleme erkannt werden.
+
+Bestehende Skripte, die an den Legacy-Modul-Eintrag gebunden sind, verwenden weiterhin die entsprechenden `SINCLAIR_`-Funktionen.
