@@ -50,7 +50,7 @@ Falls das Gerät für die Dauer von 15*[getStatus Intervall Sek] nicht pingbar i
 Über das Modul-Control folgende URL hinzufügen.  
 `https://github.com/emjayhome/GreeAC-Symcon`
 
-Nach einem Update bleibt die bestehende Instanz mit ihrer Konfiguration erhalten. Da der öffentliche Präfix von `SINCLAIR` auf `GREE` wechselt, müssen Skripte, die Modul-Funktionen aufrufen, von `SINCLAIR_...` auf `GREE_...` umgestellt werden. Die Variablenprofile heißen danach `GREE.*` statt `SINCLAIR.*`.
+Nach einem Update bleibt die bestehende Instanz mit ihrer Konfiguration erhalten. Der öffentliche Präfix ist `GREE`; Skripte, die noch Modul-Funktionen mit `SINCLAIR_...` aufrufen, müssen auf `GREE_...` umgestellt werden. Die Variablenprofile des Moduls heißen `GREE.*`.
 
 
 ### 4. Einrichten der Instanzen in IP-Symcon
@@ -62,7 +62,10 @@ __Konfigurationsseite__:
 
 Name       | Beschreibung
 ---------- | ---------------------------------
-Host/IP             | DNS oder IP Adresse des WLAN Moduls der Inneneinheit
+Sende-Host             | DNS oder IP Adresse des WLAN Moduls der Inneneinheit
+Sende-Port             | Port des WLAN Moduls der Inneneinheit
+Empf.-Host             | DNS oder IP Adresse des IP Symcon Servers
+Empf.-Port             | Port des IP Symcon Servers (typischerweise 0)
 
 #### 4.2 Instanz konfigurieren
 __Konfigurationsseite__:
@@ -70,6 +73,8 @@ __Konfigurationsseite__:
 Name       | Beschreibung
 ---------- | ---------------------------------
 Instanz aktivieren  | Aktiviert die Instanz und den Aktualisierungstimer
+Verschlüsselung  | Passende Verschlüsselung auswählen
+Broadcast-Adresse  | Broadcast-Adresse des verwendeten IP Netzwerks
 Ventilationsstufen  | Anzahl der Ventilationsstufen ohne Automodus (Anzahl der Balken auf der Fernbedienung)
 Swing Links-Rechts  | Ist ein motorisierter Links <-> Rechts Luftleiter vorhanden
 Frischluftventil    | Ist ein Frischluftventil vorhanden (meistens nicht)

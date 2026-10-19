@@ -12,7 +12,7 @@
     { "type": "Select", "name": "encryptionType", "caption": "Verschlüsselung (Firmware)",
       "options": [
         { "caption": "AES-128-ECB (alt, Standard)", "value": "ECB" },
-        { "caption": "AES-128-GCM (neu, Gree ab ca. 2022)", "value": "GCM" }
+        { "caption": "AES-128-GCM (neu, GREE ab ca. 2022)", "value": "GCM" }
       ],
       "description": "Wählen Sie den Verschlüsselungsmodus entsprechend der Firmware Ihres Geräts. Bei Problemen mit der Verbindung probieren Sie GCM."
     },
