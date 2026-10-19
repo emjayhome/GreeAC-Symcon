@@ -2,17 +2,17 @@
 
 Maintainer: **EmJayHome** ([GitHub: emjayhome](https://github.com/emjayhome)).
 
-Dieses eigenständig veröffentlichte Modul basiert ursprünglich auf dem Modul [GreeAC-Symcon von emtek-at](https://github.com/emtek-at/GreeAC-Symcon) und wurde unter anderem um AES-128-GCM-Unterstützung erweitert. Der Fork hat eigene IP-Symcon-Bibliotheks- und Modul-UUIDs.
+Dieses eigenständig veröffentlichte Modul basiert ursprünglich auf dem Modul [GREE AC-Symcon von emtek-at](https://github.com/emtek-at/GreeAC-Symcon) und wurde unter anderem um AES-128-GCM-Unterstützung erweitert. Der Fork hat eigene IP-Symcon-Bibliotheks- und Modul-UUIDs.
 
-Modul um Klimaanlagen mit Wifi Modul der Hersteller Gree zu steuern.
+Modul um Klimaanlagen mit Wifi Modul der Hersteller GREE zu steuern.
 
 Das Modul **GREE AC WiFi** verwendet die Modul-ID `{74450BAA-459C-4042-8A4C-BF7DDA175259}` und den Präfix `GREE`. Die bisherige Modul-ID bleibt erhalten, damit bestehende Instanzen ihre Identität und Konfiguration behalten.
 
 Unterstützte Marken:
-- Sinclair
-- Gree
+- SINCLAIR
+- GREE
 
-Gree stellt auch Klimaanlagen unter anderen Firmennamen her, deshalb kann das Modul auch bei anderen Marken funktioniern. Falls das Modul bei einer anderen Anlage als den oben genannten funktioniert, bitte mitteilen, dann kann ich es in die Liste aufnehmen.
+GREE stellt auch Klimaanlagen unter anderen Firmennamen her, deshalb kann das Modul auch bei anderen Marken funktioniern. Falls das Modul bei einer anderen Anlage als den oben genannten funktioniert, bitte mitteilen, dann kann ich es in die Liste aufnehmen.
 
 
 ### Inhaltverzeichnis
@@ -50,7 +50,7 @@ Falls das Gerät für die Dauer von 15*[getStatus Intervall Sek] nicht pingbar i
 Über das Modul-Control folgende URL hinzufügen.  
 `https://github.com/emjayhome/GreeAC-Symcon`
 
-Nach einem Update bleibt die bestehende Instanz mit ihrer Konfiguration erhalten. Da der öffentliche Präfix von `SINCLAIR` auf `GREE` wechselt, müssen Skripte, die Modul-Funktionen aufrufen, von `SINCLAIR_...` auf `GREE_...` umgestellt werden. Die Variablenprofile heißen danach `GREE.*` statt `Sinclair.*`.
+Nach einem Update bleibt die bestehende Instanz mit ihrer Konfiguration erhalten. Da der öffentliche Präfix von `SINCLAIR` auf `GREE` wechselt, müssen Skripte, die Modul-Funktionen aufrufen, von `SINCLAIR_...` auf `GREE_...` umgestellt werden. Die Variablenprofile heißen danach `GREE.*` statt `SINCLAIR.*`.
 
 
 ### 4. Einrichten der Instanzen in IP-Symcon
